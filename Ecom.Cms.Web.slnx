@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Ecom.Cms.Application.Authentication/Ecom.Cms.Application.Authentication.csproj" Id="554e99fb-e224-4233-b6fe-3aac9ccfedf8" />
+  <Project Path="Ecom.Cms.Application.User/Ecom.Cms.Application.User.csproj" Id="6b753486-5c30-4d10-9adc-b40c78654e4b" />
+  <Project Path="Ecom.Cms.Web.Shared/Ecom.Cms.Web.Shared.csproj" Id="d3a880d4-c9ac-46a0-be23-3b780f1191a0" />
+  <Project Path="Ecom.Cms.Web/Ecom.Cms.Web.csproj" />
+</Solution>

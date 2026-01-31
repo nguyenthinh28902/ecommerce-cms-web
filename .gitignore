@@ -8,6 +8,21 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
 # Build results
+# Loại bỏ node_modules ở bất kỳ đâu
+**/node_modules/
+node_modules/
+
+# Loại bỏ các file tạm của Visual Studio
+.vs/
+[Bb]in/
+[Oo]bj/
+
+# Loại bỏ các file build của Frontend
+Ecom.Cms.Web/wwwroot/lib/
+dist/
+# Build outputs
+
+build/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
