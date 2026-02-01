@@ -51,6 +51,7 @@ namespace Ecom.Cms.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignOut()
         {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
             // 1. Xóa Cookie của ứng dụng CMS hiện tại
             // Điều này làm sạch HttpContext.User tại CMS
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -59,7 +60,7 @@ namespace Ecom.Cms.Web.Controllers
             // Nó sẽ điều hướng người dùng sang Identity Server để xóa Session ở đó
             // Sau khi xong, Identity Server sẽ quay lại RedirectUri bạn đã cấu hình
             return SignOut(new AuthenticationProperties {
-                RedirectUri = "/" // Trang sẽ quay về sau khi đăng xuất hoàn tất
+                RedirectUri = baseUrl // Trang sẽ quay về sau khi đăng xuất hoàn tất
             }, "oidc");
         }
 

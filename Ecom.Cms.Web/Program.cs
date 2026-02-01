@@ -7,6 +7,7 @@ using Ecom.Cms.Web.Common.HeaderHandler;
 
 var builder = WebApplication.CreateBuilder(args);
 Console.OutputEncoding = System.Text.Encoding.UTF8;
+Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
 // Đăng ký IHttpClientFactory
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();

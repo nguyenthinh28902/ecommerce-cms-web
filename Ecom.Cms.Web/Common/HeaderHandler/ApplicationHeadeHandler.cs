@@ -21,11 +21,15 @@ namespace Ecom.Cms.Web.Common.HeaderHandler
             {
                 client.BaseAddress = new Uri($"{systemConfig.GatewayUrl}");
                 client.DefaultRequestHeaders.Add("X-App-Name", systemConfig.ClientId);
+                // Để hẳn 10 phút cho thoải mái Debug
+                client.Timeout = TimeSpan.FromMinutes(10);
             }); // Cần thêm dòng này
             services.AddHttpClient<IUserInformation, UserInformation>(client =>
             {
                 client.BaseAddress = new Uri($"{systemConfig.GatewayUrl}{ConfigApiUser.GetDefault}");
                 client.DefaultRequestHeaders.Add("X-App-Name", systemConfig.ClientId);
+                // Để hẳn 10 phút cho thoải mái Debug
+                client.Timeout = TimeSpan.FromMinutes(10);
             }).AddHttpMessageHandler<AuthenticationHeaderHandler>(); // Cần thêm dòng này
             return services;
         }

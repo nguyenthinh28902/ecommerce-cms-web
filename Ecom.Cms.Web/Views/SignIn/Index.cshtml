@@ -9,23 +9,26 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 
-<div id="app" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#e0f7f0] to-[#ffffff] font-sans text-[#2c3e50]">
+<div id="app" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f3f0ff] to-[#ffffff] font-sans text-[#2c3e50]">
     <div class="bg-white p-10 rounded-[40px] shadow-2xl w-full max-w-[500px] text-center border border-white">
 
-        <h1 class="text-[#42d392] text-4xl font-extrabold mb-2 tracking-tight">Xin chào!</h1>
-        <h2 class="text-[#42d392] text-xl font-bold mb-4 uppercase tracking-wider">Hệ thống thương mại điện tử</h2>
+        @* Đổi màu tiêu đề sang Tím .NET *@
+        <h1 class="text-[#512bd4] text-4xl font-extrabold mb-2 tracking-tight">Xin chào!</h1>
+        <h2 class="text-[#512bd4] text-xl font-bold mb-4 uppercase tracking-wider">Hệ thống thương mại điện tử</h2>
         <p class="text-gray-400 italic mb-8">Chào mừng bạn đến với hệ thống CMS</p>
 
-        <div class="bg-[#f0fdf9] border border-[#e2f2ed] rounded-3xl p-8 mb-6">
+        @* Đổi nền khối nội dung sang tím cực nhạt *@
+        <div class="bg-[#f5f3ff] border border-[#ede9fe] rounded-3xl p-8 mb-6">
+
             <p class="text-gray-600 text-sm mb-6">Vui lòng xác thực qua hệ thống trung tâm để tiếp tục.</p>
 
-            @* Sử dụng Html.BeginForm để render HTML trực tiếp từ Server *@
             @using (Html.BeginForm("RedirectToLogin", "SignIn", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
                 @Html.HiddenFor(m => m.ReturnUrl)
 
-                <button type="submit" class="w-full bg-[#00dc82] hover:bg-[#00c171] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition duration-300 shadow-lg shadow-green-100 mt-4">
+                @* Đổi màu nút sang Tím .NET (#512bd4) và hiệu ứng hover *@
+                <button type="submit" class="w-full bg-[#512bd4] hover:bg-[#4623bb] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition duration-300 shadow-lg shadow-purple-100 mt-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
@@ -35,7 +38,7 @@
         </div>
 
         <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">
-            © 2026 Ecommerce CMS - Powered by <span class="text-[#42d392]">Vue 3</span>
+            © 2026 Ecommerce CMS - Powered by <span class="text-[#512bd4]">.NET 8 & Vue 3</span>
         </p>
     </div>
 </div>
