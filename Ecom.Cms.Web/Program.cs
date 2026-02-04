@@ -35,7 +35,22 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+// Cấu hình trong Program.cs
+app.UseStaticFiles(new StaticFileOptions {
+    OnPrepareResponse = ctx =>
+    {
+        // 3,888,000 giây = 45 ngày
+        const int durationInSeconds = 3888000;
 
+        // Chỉ cache cho thư mục chứa hình ảnh
+        if (ctx.Context.Request.Path.Value != null &&
+        ctx.Context.Request.Path.Value.Contains("/ecommerce-web-image-product/"))
+        {
+            ctx.Context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.CacheControl] =
+                $"public,max-age={durationInSeconds}";
+        }
+    }
+});
 app.UseHttpsRedirection();
 app.UseRouting();
 

@@ -6,6 +6,7 @@ using Ecom.Cms.Web.Shared.Models.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
+using System.Text.Json;
 namespace Ecom.Cms.Application.Authentication.Services
 {
     public class AuthAppService : IAuthAppService
@@ -50,32 +51,45 @@ namespace Ecom.Cms.Application.Authentication.Services
 
         public async Task<Result<TokenResponseDto>> ExchangeCodeForTokenAsync(string code, string codeVerifier)
         {
-
-
-            var requestPayload = new
+            // 1. Chuẩn bị dữ liệu Body (Theo chuẩn OAuth2: application/x-www-form-urlencoded)
+            // Chuyển từ anonymous object sang Dictionary để dùng cho FormUrlEncodedContent
+            var dict = new Dictionary<string, string>
             {
-                Code = code,
-                CodeVerifier = codeVerifier,
-                RedirectUri = _config.CallbackUrl,
-                GrantType = "authorization_code", // Bổ sung
-                Scope = _config.AuthScope,        // Bổ sung: "openid profile offline_access"
-                ClientId = _config.ClientId       // Bổ sung
+                { "code", code },
+                { "redirect_uri", _config.CallbackUrl },
+                { "code_verifier", codeVerifier },
             };
+
+            var content = new FormUrlEncodedContent(dict);
 
             try
             {
-                // exchangeUrl lúc này chỉ cần là đường dẫn tương đối, ví dụ: "api/auth/exchange"
+                // 2. Tạo RequestMessage để can thiệp vào Header
                 var exchangeUrl = ConfigApiAuth.ExchangeCodeForToken;
+                var request = new HttpRequestMessage(HttpMethod.Post, exchangeUrl) {
+                    Content = content
+                };
 
-                var response = await _httpClient.PostAsJsonAsync(exchangeUrl, requestPayload);
+                // 3. Cấu hình Basic Auth Header: Base64(client_id:client_secret)
+                var authString = Convert.ToBase64String(
+                    System.Text.Encoding.ASCII.GetBytes($"{_config.ClientId}:{_config.ClientSecret}"));
+
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authString);
+
+                // Log thông tin để kiểm tra (tương tự hàm trên)
+                _logger.LogInformation($"data form client change token: {JsonSerializer.Serialize(dict)}");
+
+                // 4. Thực thi gửi request bằng SendAsync thay vì PostAsJsonAsync
+                var response = await _httpClient.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorDetails = await response.Content.ReadAsStringAsync();
                     _logger.LogError("Lỗi Identity Server: {Status} - {Details}", response.StatusCode, errorDetails);
-                    return Result<TokenResponseDto>.Failure($"Lỗi kết nối Server: {response.StatusCode}");
+                    return Result<TokenResponseDto>.Failure($"Lỗi xác thực: {response.StatusCode}");
                 }
 
+                // 5. Đọc dữ liệu trả về
                 var result = await response.Content.ReadFromJsonAsync<Result<TokenResponseDto>>();
 
                 if (result == null || result.Data == null)
