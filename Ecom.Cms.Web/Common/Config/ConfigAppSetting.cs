@@ -6,8 +6,10 @@ namespace Ecom.Cms.Web.Common.Config
     {
         public static IServiceCollection AddConfigAppSetting(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<SystemConfig>(
-                configuration.GetSection(SystemConfig.ConfigSection));
+            services.Configure<ConfigClientIdentity>(
+                configuration.GetSection(nameof(ConfigClientIdentity)));
+            services.Configure<ConfigServiceUrl>(
+               configuration.GetSection(nameof(ConfigServiceUrl)));
             return services;
         }
     }

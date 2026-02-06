@@ -1,4 +1,6 @@
 ﻿@using Ecom.Cms.Web.Shared.Models.AuthWeb
+@using System.Security.Claims
+@using Ecom.Cms.Web.Shared.Models.Custom
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -56,20 +58,20 @@
                             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
                                 <img src="@User.FindFirst("Avatar")?.Value" alt="mdo" width="32" height="32" class="rounded-circle me-2 bg-secondary">
                                 <div class="me-2">
-                                    <div class="fw-bold small">@User.FindFirst("FullName")?.Value</div>
-                                    <div class="text-muted" style="font-size: 0.7rem;">@User.FindFirst("DeptName")?.Value</div>
+                                    <div class="fw-bold small">@User.FindFirst(ClaimTypes.Name)?.Value</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">@User.FindFirst(ClaimCustomTypes.DepartmentName.ToString())?.Value</div>
                                 </div>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-xl p-2">
                                 <li>
                                     <a class="dropdown-item rounded-lg py-2" href="/Profile">
-                                        <i class="bi bi-person me-2"></i>Hồ sơ
+                                        <i class="bi bi-person me-2"></i>Hồ sơ  d
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider opacity-50"></li>
                                 <li>
                                     @* Sử dụng Form để đảm bảo an toàn bảo mật *@
-                                    <form asp-controller="SignIn" asp-action="SignOut" method="post" id="logoutForm" class="m-0">
+                                    <form asp-controller="SignIn" asp-action="Logout" method="post" id="logoutForm" class="m-0">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="dropdown-item text-danger rounded-lg py-2 d-flex align-items-center w-100 border-0 bg-transparent">
                                             <i class="bi bi-box-arrow-right me-2"></i>

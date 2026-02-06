@@ -11,23 +11,21 @@ namespace Ecom.Cms.Web.Common.HeaderHandler
     {
         public static IServiceCollection AddApplicationHeadeHandler(this IServiceCollection services, IConfiguration configuration)
         {
-            var systemConfig = configuration.GetSection("SystemConfig").Get<SystemConfig>();
-
-            if (systemConfig == null || string.IsNullOrEmpty(systemConfig.GatewayUrl))
+            var systemConfig = configuration.GetSection(nameof(ConfigClientIdentity)).Get<ConfigClientIdentity>();
+            var configServiceUrl = configuration.GetSection(nameof(ConfigServiceUrl)).Get<ConfigServiceUrl>();
+            if (systemConfig == null || configServiceUrl == null)
             {
                 throw new Exception("Thiếu cấu hình SystemConfig hoặc GatewayUrl trong appsettings.json");
             }
             services.AddHttpClient<IAuthAppService, AuthAppService>(client =>
             {
-                client.BaseAddress = new Uri($"{systemConfig.GatewayUrl}");
-                client.DefaultRequestHeaders.Add("X-App-Name", systemConfig.ClientId);
+                client.BaseAddress = new Uri($"{configServiceUrl.IdentityUrl}");
                 // Để hẳn 10 phút cho thoải mái Debug
                 client.Timeout = TimeSpan.FromMinutes(10);
             }); // Cần thêm dòng này
             services.AddHttpClient<IUserInformation, UserInformation>(client =>
             {
-                client.BaseAddress = new Uri($"{systemConfig.GatewayUrl}{ConfigApiUser.GetDefault}");
-                client.DefaultRequestHeaders.Add("X-App-Name", systemConfig.ClientId);
+                client.BaseAddress = new Uri($"{configServiceUrl.GatewayUrl}{ConfigApiUser.GetDefault}");
                 // Để hẳn 10 phút cho thoải mái Debug
                 client.Timeout = TimeSpan.FromMinutes(10);
             }).AddHttpMessageHandler<AuthenticationHeaderHandler>(); // Cần thêm dòng này

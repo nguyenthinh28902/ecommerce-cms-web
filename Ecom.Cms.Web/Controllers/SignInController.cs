@@ -1,5 +1,4 @@
-﻿using Ecom.Cms.Web.lib;
-using Ecom.Cms.Web.Shared.Interfaces.Auth;
+﻿using Ecom.Cms.Web.Shared.Interfaces.Auth;
 using Ecom.Cms.Web.Shared.Models.Auth.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -32,26 +31,25 @@ namespace Ecom.Cms.Web.Controllers
         [ValidateAntiForgeryToken] // Bảo mật chống giả mạo request
         public IActionResult RedirectToLogin(string returnUrl)
         {
-            // 1. TẠO CODE VERIFIER (Chuỗi gốc bí mật)
-            // Nếu không dùng thư viện IdentityModel, bạn có thể dùng Guid.NewGuid() hoặc RandomBytes
-            string codeVerifier = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"); // Tạo chuỗi ngẫu nhiên
-            string codeChallenge = LibSecurity.GenerateCodeChallenge(codeVerifier);
-            HttpContext.Session.SetString("pkce_verifier", codeVerifier);
-            // Server tính toán URL thông qua Service đã inject
-            var identityUrl = _authAppService.GetIdentityServerLoginUrl(returnUrl, codeChallenge);
+            // 1. Bảo mật: Đảm bảo returnUrl là đường dẫn nội bộ, tránh Open Redirect Attack
+            // Nếu không hợp lệ hoặc trống, mặc định quay về trang chủ
+            if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
+            {
+                returnUrl = "/";
+            }
+            var properties = new AuthenticationProperties {
+                RedirectUri = returnUrl
+            };
 
-            // Ghi log trước khi chuyển hướng (sử dụng ILogger đã cài đặt)
-            _logger.LogInformation("Redirecting to Identity Server via Gateway: {Url}", identityUrl);
-
-            // Thực hiện chuyển hướng từ phía Server
-            return Redirect(identityUrl);
+            return Challenge(properties, "oidc");
         }
 
         [HttpPost("dang-xuat-he-thong")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignOut()
+        public async Task<IActionResult> Logout()
         {
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            _logger.LogInformation($"đường dẫn logout: {baseUrl}");
             // 1. Xóa Cookie của ứng dụng CMS hiện tại
             // Điều này làm sạch HttpContext.User tại CMS
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

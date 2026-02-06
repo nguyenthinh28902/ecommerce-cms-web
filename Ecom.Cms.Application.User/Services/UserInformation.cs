@@ -13,10 +13,10 @@ namespace Ecom.Cms.Application.User.Services
     public class UserInformation : IUserInformation
     {
         private readonly ILogger<UserInformation> _logger;
-        private readonly SystemConfig _config;
+        private readonly ConfigClientIdentity _config;
         private readonly HttpClient _httpClient;
         public UserInformation(ILogger<UserInformation> logger,
-            IOptions<SystemConfig> options,
+            IOptions<ConfigClientIdentity> options,
            HttpClient httpClient)
         {
             _logger = logger;
