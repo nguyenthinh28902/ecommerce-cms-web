@@ -1,4 +1,7 @@
 ﻿using Ecom.Cms.Application.Authentication.Services;
+using Ecom.Cms.Application.Product.Interfaces;
+using Ecom.Cms.Application.Product.Models;
+using Ecom.Cms.Application.Product.Services;
 using Ecom.Cms.Application.User.Models;
 using Ecom.Cms.Application.User.Services;
 using Ecom.Cms.Web.Shared.Interfaces.Auth;
@@ -26,6 +29,14 @@ namespace Ecom.Cms.Web.Common.HeaderHandler
             services.AddHttpClient<IUserInformation, UserInformation>(client =>
             {
                 client.BaseAddress = new Uri($"{configServiceUrl.GatewayUrl}{ConfigApiUser.GetDefault}");
+                // Để hẳn 10 phút cho thoải mái Debug
+                client.Timeout = TimeSpan.FromMinutes(10);
+            }).AddHttpMessageHandler<AuthenticationHeaderHandler>(); // Cần thêm dòng này
+
+
+            services.AddHttpClient<IProductSummaryService, ProductSummaryService>(client =>
+            {
+                client.BaseAddress = new Uri($"{configServiceUrl.GatewayUrl}{ConfigApiProductService.GetDefault}");
                 // Để hẳn 10 phút cho thoải mái Debug
                 client.Timeout = TimeSpan.FromMinutes(10);
             }).AddHttpMessageHandler<AuthenticationHeaderHandler>(); // Cần thêm dòng này

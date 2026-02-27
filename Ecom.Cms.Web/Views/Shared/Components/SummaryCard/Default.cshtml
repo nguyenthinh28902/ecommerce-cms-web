@@ -1,0 +1,79 @@
+﻿@using Ecom.Cms.Web.Shared.Models.Dashboard
+@model List<SummaryMetrics>
+
+@{
+    var colorClass = string.Empty;
+}
+
+@{
+    if (Model.Count > 1)
+    {
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100 overflow-hidden">
+                <div class="card-header bg-primary text-white py-2 px-3 d-flex align-items-center justify-content-between">
+                    <span class="fw-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                        <i class="bi bi-box-seam me-2"></i> @Model.FirstOrDefault()?.TitleGroup
+                    </span>
+                    <i class="bi bi-chevron-right small opacity-75"></i>
+                </div>
+                <div class="card-body p-0 d-flex flex-column justify-content-center">
+                    @foreach (var metric in Model)
+                    {
+                        colorClass = DashboardConstants.GetColorByTitle(metric.Title);
+                        var itemIcon = metric.Title.Contains("kinh doanh") ? "bi-check-circle" :
+                        metric.Title.Contains("chờ") ? "bi-hourglass-split" : "bi-rocket-takeoff";
+
+                        <div class="d-flex justify-content-between align-items-center py-3 px-3 border-bottom border-light last-child-no-border">
+                            <div class="d-flex align-items-center">
+                                <i class="bi @itemIcon me-2 opacity-50 @colorClass.Split(' ')[0]"></i>
+                                <span class="text-secondary" style="font-size: 0.85rem;">@metric.Title</span>
+                            </div>
+                            <span class="fw-bold @colorClass.Split(' ')[0]" style="font-size: 1rem;">@metric.value.ToString("N0")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        var metric = Model.FirstOrDefault();
+        if (metric != null)
+        {
+            colorClass = DashboardConstants.GetColorByTitle(metric.Title);
+            var displayIcon = DashboardConstants.GetIconByTitle(metric.Title);
+
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-white border-start border-4 @colorClass h-100 shadow-sm transition-hover border border-light">
+                    <div class="d-flex flex-column h-100 justify-content-between">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <p class="text-muted fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.8px; text-transform: uppercase;">
+                                @metric.Title
+                            </p>
+                            <div class="@colorClass.Split(' ')[0] bg-opacity-10 p-2 rounded-circle">
+                                <i class="bi @displayIcon" style="font-size: 1.4rem;"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 class="mb-0 fw-bold text-dark" style="font-size: 2.2rem; letter-spacing: -1px;">
+                                @metric.value.ToString("N0")
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
+<style>
+    .transition-hover {
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+        .transition-hover:hover {
+            background-color: #fafafa !important;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.08) !important;
+        }
+</style>

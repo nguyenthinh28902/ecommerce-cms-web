@@ -1,47 +1,32 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Ecom.Cms.Web.Shared.Models.Dashboard
+@model List<DashboardViewModel>
+
+@{
+    ViewData["Title"] = "Trang chủ E-Com";
 }
 
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm bg-info text-white">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="text-uppercase mb-2">Ngành hàng</h6>
-                        <h2 class="mb-0 fw-bold">124</h2>
-                    </div>
-                    <i class="bi bi-grid-3x3-gap fs-1 opacity-50"></i>
-                </div>
+<div class="container-fluid py-4">
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+            <div>
+                <strong>Thông báo:</strong> @ViewBag.ErrorMessage
             </div>
         </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm bg-warning text-dark">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="text-uppercase mb-2">Thương hiệu</h6>
-                        <h2 class="mb-0 fw-bold">45</h2>
-                    </div>
-                    <i class="bi bi-patch-check fs-1 opacity-50"></i>
-                </div>
-            </div>
+    }
+    else if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-inbox text-muted fs-1"></i>
+            <p class="mt-2 text-muted">Bạn không có quyền xem dữ liệu hoặc không có nội dung để hiển thị.</p>
         </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm bg-success text-white">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="text-uppercase mb-2">Sản phẩm</h6>
-                        <h2 class="mb-0 fw-bold">1,250</h2>
-                    </div>
-                    <i class="bi bi-box-seam fs-1 opacity-50"></i>
-                </div>
-            </div>
-        </div>
-    </div>
+    }
+    else
+    {
+        @foreach (var roleBoard in Model)
+        {
+            @await Component.InvokeAsync("DashboardContainer", roleBoard)
+        }
+    }
 </div>

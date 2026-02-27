@@ -1,4 +1,5 @@
 ﻿using Ecom.Cms.Application.Authentication;
+using Ecom.Cms.Application.Product;
 using Ecom.Cms.Application.User;
 using Ecom.Cms.Web.Common.Auth;
 using Ecom.Cms.Web.Common.AuthCookie;
@@ -26,6 +27,7 @@ builder.Services.AddControllersWithViews();
 // application DI
 builder.Services.AddApplicationAuthenticationDependencyInjection(builder.Configuration);
 builder.Services.AddApplicationUserDependencyInjection(builder.Configuration);
+builder.Services.AddApplicationProductDependencyInjection(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

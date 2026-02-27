@@ -1,0 +1,35 @@
+﻿@using Ecom.Cms.Web.Shared.Models.Dashboard
+@model DashboardViewModel
+
+<div class="dashboard-section mb-4">
+    <h5 class="fw-bold mb-3 text-dark border-start border-4 border-primary ps-3" style="font-size: 1.1rem;">
+        @Model.Title
+    </h5>
+
+    <div class="row g-3">
+        @{
+            var groupedMetrics = Model.SummaryMetrics.GroupBy(x => x.Group);
+        }
+
+        @foreach (var group in groupedMetrics)
+        {
+            if (group.Key == null)
+            {
+                @foreach (var metric in group)
+                {
+                    @await Component.InvokeAsync("SummaryCard", new List<SummaryMetrics> { metric })
+                }
+            }
+            else
+            {
+                @await Component.InvokeAsync("SummaryCard", group.ToList())
+            }
+        }
+    </div>
+</div>
+
+<style>
+    .last-child-no-border:last-child {
+        border-bottom: none !important;
+    }
+</style>

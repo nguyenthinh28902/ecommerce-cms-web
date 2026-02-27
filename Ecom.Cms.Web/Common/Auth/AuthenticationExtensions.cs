@@ -4,6 +4,7 @@ using Ecom.Cms.Web.Shared.Models.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace Ecom.Cms.Web.Common.Auth
 {
@@ -62,12 +63,14 @@ namespace Ecom.Cms.Web.Common.Auth
                 options.Events = new OpenIdConnectEvents {
                     OnTokenValidated = async context =>
                     {
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
                         var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
                         if (claimsIdentity == null) return;
                         var accessToken = context.TokenEndpointResponse?.AccessToken;
                         if (!string.IsNullOrEmpty(accessToken))
                         {
-                            claimsIdentity.AddClaim(new Claim("access_token", accessToken));
+                            //claimsIdentity.AddClaim(new Claim("access_token", accessToken));
+                            //logger.LogInformation($"Token ở đây nè nhìn vào đây: {accessToken}");
                         }
 
                         var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -94,11 +97,15 @@ namespace Ecom.Cms.Web.Common.Auth
                                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, deptCode));
                                 }
 
+                                // Chỉ lấy Type và Value của các Claim để log
+                                var userClaims = claimsIdentity.Claims.Select(c => new { c.Type, c.Value });
+
+                                logger.LogInformation("Thông tin claim user login: {Claims}", JsonSerializer.Serialize(userClaims));
                             }
                         }
                         catch (Exception ex)
                         {
-                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+
                             logger.LogError(ex, "Lỗi xảy ra khi gọi UserService để lấy thêm thông tin cho User {UserId}", userId);
                         }
                         await Task.CompletedTask;

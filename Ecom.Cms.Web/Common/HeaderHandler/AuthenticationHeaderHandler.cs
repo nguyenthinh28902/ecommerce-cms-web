@@ -20,43 +20,37 @@ namespace Ecom.Cms.Web.Common.HeaderHandler
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            // Lấy Token từ Claims mà chúng ta đã lưu lúc Login thành công
             var accessToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
 
             if (!string.IsNullOrEmpty(accessToken))
             {
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                var response = await base.SendAsync(request, cancellationToken);
+            }
 
-                // 3. Nếu lỗi 401 (Unauthorized) - Có thể token đã hết hạn
-                if (response.StatusCode == HttpStatusCode.Unauthorized)
+            var response = await base.SendAsync(request, cancellationToken);
+
+            // Xử lý làm mới token nếu API trả về lỗi không được phép
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                var refreshToken = await _httpContextAccessor.HttpContext.GetTokenAsync("refresh_token");
+
+                if (!string.IsNullOrEmpty(refreshToken))
                 {
-                    var refreshToken = await _httpContextAccessor.HttpContext.GetTokenAsync("refresh_token");
+                    var authService = _httpContextAccessor.HttpContext.RequestServices.GetRequiredService<IAuthAppService>();
+                    var refreshResult = await authService.RefreshTokenAsync(refreshToken);
 
-                    if (!string.IsNullOrEmpty(refreshToken))
+                    if (refreshResult.IsSuccess)
                     {
-                        // Lấy AuthAppService từ RequestServices (để tránh lỗi vòng lặp DI)
-                        var authService = _httpContextAccessor.HttpContext.RequestServices.GetRequiredService<IAuthAppService>();
+                        await _authTokenCookie.UpdateAuthCookie(refreshResult.Data);
 
-                        // Gọi hàm RefreshTokenAsync đã viết [cite: 2026-01-19]
-                        var refreshResult = await authService.RefreshTokenAsync(refreshToken);
-
-                        if (refreshResult.IsSuccess)
-                        {
-                            // Lưu cặp Token mới vào Cookie
-                            await _authTokenCookie.UpdateAuthCookie(refreshResult.Data);
-
-                            // Thay Token mới vào request cũ và thử lại lần cuối
-                            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Data.AccessToken);
-                            return await base.SendAsync(request, cancellationToken);
-                        }
+                        // Thử lại request với token mới
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Data.AccessToken);
+                        return await base.SendAsync(request, cancellationToken);
                     }
                 }
-
-
             }
-            // 2. Thực hiện Request
-            return await base.SendAsync(request, cancellationToken);
+
+            return response;
         }
     }
 }

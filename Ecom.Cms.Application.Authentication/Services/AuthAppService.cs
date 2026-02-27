@@ -34,6 +34,7 @@ namespace Ecom.Cms.Application.Authentication.Services
                     { "grant_type", "refresh_token" },
                     { "refresh_token", refreshToken },
                     { "client_id", _config.ClientId }, // Ví dụ: cms_admin_client [cite: 2026-01-19]
+                    { "client_secret", _config.ClientSecret },
                     { "scope", _config.AuthScope }     // openid profile offline_access
                 };
 
@@ -41,7 +42,7 @@ namespace Ecom.Cms.Application.Authentication.Services
                 var requestContent = new FormUrlEncodedContent(dict);
 
                 // 3. Gọi qua Gateway (Endpoint đã được định nghĩa trong proxy-config.yaml) [cite: 2026-01-19]
-                var response = await _httpClient.PostAsync("api/auth/connect/token", requestContent);
+                var response = await _httpClient.PostAsync("connect/token", requestContent);
 
                 if (!response.IsSuccessStatusCode)
                 {
