@@ -70,7 +70,7 @@ namespace Ecom.Cms.Web.Common.Auth
                         if (!string.IsNullOrEmpty(accessToken))
                         {
                             //claimsIdentity.AddClaim(new Claim("access_token", accessToken));
-                            //logger.LogInformation($"Token ở đây nè nhìn vào đây: {accessToken}");
+                            logger.LogInformation($"Token ở đây nè nhìn vào đây: {accessToken}");
                         }
 
                         var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value;

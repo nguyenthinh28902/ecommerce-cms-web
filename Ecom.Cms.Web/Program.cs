@@ -46,7 +46,7 @@ app.UseStaticFiles(new StaticFileOptions {
 
         // Chỉ cache cho thư mục chứa hình ảnh
         if (ctx.Context.Request.Path.Value != null &&
-        ctx.Context.Request.Path.Value.Contains("/ecommerce-web-image-product/"))
+        ctx.Context.Request.Path.Value.Contains("https://zhlneinpjgzpjbpozskh.supabase.co"))
         {
             ctx.Context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.CacheControl] =
                 $"public,max-age={durationInSeconds}";
