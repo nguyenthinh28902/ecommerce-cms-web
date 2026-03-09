@@ -1,4 +1,6 @@
 ﻿using Ecom.Cms.Application.Authentication.Services;
+using Ecom.Cms.Application.Order.Interfaces;
+using Ecom.Cms.Application.Order.Services;
 using Ecom.Cms.Application.Product.Interfaces;
 using Ecom.Cms.Application.Product.Models;
 using Ecom.Cms.Application.Product.Services;
@@ -20,26 +22,15 @@ namespace Ecom.Cms.Web.Common.HeaderHandler
             {
                 throw new Exception("Thiếu cấu hình SystemConfig hoặc GatewayUrl trong appsettings.json");
             }
-            services.AddHttpClient<IAuthAppService, AuthAppService>(client =>
-            {
-                client.BaseAddress = new Uri($"{configServiceUrl.IdentityUrl}");
-                // Để hẳn 10 phút cho thoải mái Debug
-                client.Timeout = TimeSpan.FromMinutes(10);
-            }); // Cần thêm dòng này
-            services.AddHttpClient<IUserInformation, UserInformation>(client =>
-            {
-                client.BaseAddress = new Uri($"{configServiceUrl.GatewayUrl}{ConfigApiUser.GetDefault}");
-                // Để hẳn 10 phút cho thoải mái Debug
-                client.Timeout = TimeSpan.FromMinutes(10);
-            }).AddHttpMessageHandler<AuthenticationHeaderHandler>(); // Cần thêm dòng này
 
+            services.AddEcomClient<IAuthAppService, AuthAppService>(configServiceUrl.IdentityUrl, useAuth: false);
 
-            services.AddHttpClient<IProductSummaryService, ProductSummaryService>(client =>
-            {
-                client.BaseAddress = new Uri($"{configServiceUrl.GatewayUrl}{ConfigApiProductService.GetDefault}");
-                // Để hẳn 10 phút cho thoải mái Debug
-                client.Timeout = TimeSpan.FromMinutes(10);
-            }).AddHttpMessageHandler<AuthenticationHeaderHandler>(); // Cần thêm dòng này
+            services.AddEcomClient<IUserInformation, UserInformation>($"{configServiceUrl.GatewayUrl}{ConfigApiUser.GetDefault}");
+
+            services.AddEcomClient<IProductSummaryService, ProductSummaryService>($"{configServiceUrl.GatewayUrl}{ConfigApiProductService.GetDefault}");
+
+            services.AddEcomClient<IOrderService, OrderService>($"{configServiceUrl.GatewayUrl}{ConfigApiOrderService.GetDefault}");
+           
             return services;
         }
     }

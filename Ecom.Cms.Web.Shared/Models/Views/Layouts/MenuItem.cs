@@ -20,6 +20,7 @@ namespace Ecom.Cms.Web.Shared.Models.Views.Layouts
                 new MenuItem { Title = "Ngành hàng", Controller = "Category", Action = "Index", Icon = "bi-grid-3x3-gap", Policies = new List<DepartmentCode>(){ DepartmentCode.Content } },
                 new MenuItem { Title = "Thương hiệu", Controller = "Brand", Action = "Index", Icon = "bi-patch-check", Policies = new List<DepartmentCode>(){ DepartmentCode.Content }},
                 new MenuItem { Title = "Sản phẩm", Controller = "Product", Action = "Index", Icon = "bi-box-seam",Policies = new List<DepartmentCode>(){ DepartmentCode.Content } },
+                new MenuItem { Title = "Đơn hàng", Controller = "Order", Action = "Index", Icon = "bi-box-seam",Policies = new List<DepartmentCode>(){ DepartmentCode.Manager, DepartmentCode.Business, DepartmentCode.Accountant } },
             };
         }
     }

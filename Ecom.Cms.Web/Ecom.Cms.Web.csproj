@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ecom.Cms.Application.Authentication\Ecom.Cms.Application.Authentication.csproj" />
+    <ProjectReference Include="..\Ecom.Cms.Application.Order\Ecom.Cms.Application.Order.csproj" />
     <ProjectReference Include="..\Ecom.Cms.Application.Product\Ecom.Cms.Application.Product.csproj" />
     <ProjectReference Include="..\Ecom.Cms.Application.User\Ecom.Cms.Application.User.csproj" />
     <ProjectReference Include="..\Ecom.Cms.Web.Shared\Ecom.Cms.Web.Shared.csproj" />

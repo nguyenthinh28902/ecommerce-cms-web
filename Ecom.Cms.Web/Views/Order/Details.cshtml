@@ -1,0 +1,65 @@
+﻿@using Ecom.Cms.Web.Shared.Models.Order.ViewModel.Order
+@model OrderViewModel
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white py-3 d-flex justify-content-between">
+            <h6 class="mb-0">Thông tin đơn hàng: @Model.OrderCode</h6>
+            <span>Ngày đặt: @Model.CreatedAt?.ToString("dd/MM/yyyy")</span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1 text-muted">Khách hàng:</p>
+                    <h6 class="fw-bold">@Html.DisplayFor(m => m.FullName)</h6>
+                    <p class="mb-1 text-muted">Số điện thoại:</p>
+                    <p>@Html.DisplayFor(m => m.PhoneNumber)</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1 text-muted">Địa chỉ giao hàng:</p>
+                    <p>@Html.DisplayFor(m => m.ShippingAddress)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white fw-bold">Sản phẩm đã đặt</div>
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th class="text-center">Số lượng</th>
+                        <th class="text-end pe-4">Đơn giá</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.OrderItems)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <img src="@p.ProductMainImage" class="rounded border" width="50" height="50" />
+                            </td>
+                            <td>
+                                <div class="fw-bold">@p.ProductName</div>
+                                <small class="text-muted">SKU: @p.Sku</small>
+                            </td>
+                            <td class="text-center">@p.Quantity</td>
+                            <td class="text-end pe-4 fw-bold">@p.UnitPrice.ToString("N0")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td colspan="3" class="text-end fw-bold">TỔNG CỘNG:</td>
+                        <td class="text-end pe-4 fw-bold text-danger fs-5">
+                            @Model.TotalAmount.ToString("N0") @Model.Currency
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
