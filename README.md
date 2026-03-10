@@ -1,6 +1,8 @@
 # Giao diện quản lý 
 ## Giới thiệu
 - Giao diện quản hệ thống thương mại điện tử
+### Thông tin chung của dự án
+[Thông tin chung dự án](https://github.com/nguyenthinh28902/mini-project-ecommerce).
 ## 🛠 Công nghệ
 - **Framework:** .NET Core / MVC
 - **Giao thức:** OpenID Connect (OIDC) & OAuth
