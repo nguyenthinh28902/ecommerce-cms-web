@@ -3,7 +3,7 @@
 ## 📝 Giới thiệu
 Hệ thống quản trị (Dashboard) dành cho nhân viên vận hành, quản lý toàn bộ nghiệp vụ của hệ thống thương mại điện tử Microservices. Dự án tập trung vào tính bảo mật cao, khả năng xử lý dữ liệu phức tạp và tối ưu hóa trải nghiệm quản trị viên.
 
-## 🔗 Core Security & Implementation (Liên kết kỹ thuật trọng tâm)
+### 🔗 Core Security & Implementation (Liên kết kỹ thuật trọng tâm)
 
 > **Tổng quan dự án xem tại đây:** [Xem đầy đủ kiến trúc tại đây](https://github.com/nguyenthinh28902/mini-project-ecommerce)
 
