@@ -50,7 +50,7 @@ Hệ thống tự động quản lý vòng đời của Access Token để đả
 ### 1. External Identity Provider Challenge (Chuyển hướng xác thực)
 Thực hiện cơ chế Challenge để yêu cầu định danh từ Identity Server khi người dùng truy cập các tài nguyên yêu cầu bảo mật.
 
-* **File:** [SignInController.cs](https://github.com/nguyenthinh28902/ecommerce-cms-web/blob/main/Ecom.Cms.Web/Controllers/SignInController.cs)
+* **File:** [SignInController.cs](https://github.com/nguyenthinh28902/ecommerce-cms-web/blob/main/Ecom.Cms.Web/Controllers/SignInController.cs#L32)
 * **Giải pháp:** Sử dụng `ValidateAntiForgeryToken` và kiểm tra `IsLocalUrl` để ngăn chặn các cuộc tấn công giả mạo (CSRF) và điều hướng không an toàn (Open Redirect).
 
 ```csharp
@@ -66,7 +66,7 @@ public IActionResult RedirectToLogin(string returnUrl)
 ### 2. Security Middleware & Policy (Cấu hình chính sách bảo mật)
 Thiết lập cơ chế lưu trữ phiên làm việc qua Cookie và giao thức kết nối bảo mật với Identity Provider.
 
-* **File:** [AuthenticationExtensions.cs](https://github.com/nguyenthinh28902/ecommerce-cms-web/blob/main/Ecom.Cms.Web/Common/Auth/AuthenticationExtensions.cs)
+* **File:** [AuthenticationExtensions.cs](https://github.com/nguyenthinh28902/ecommerce-cms-web/blob/main/Ecom.Cms.Web/Common/Auth/AuthenticationExtensions.cs#L21)
 * **Giải pháp:** Triển khai **Authorization Code Flow với PKCE** và thiết lập thuộc tính Cookie nghiêm ngặt (`HttpOnly`, `SecurePolicy`) để bảo vệ Access Token.
 
 ```csharp
