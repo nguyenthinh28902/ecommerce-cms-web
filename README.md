@@ -113,7 +113,7 @@ protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage 
         if (refreshResult.IsSuccess)
         {
             await _authTokenCookie.UpdateAuthCookie(refreshResult.Data);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.Data.AccessToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Data.AccessToken);
             return await base.SendAsync(request, ct); // Retry request
         }
     }
