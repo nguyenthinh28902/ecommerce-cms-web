@@ -23,7 +23,7 @@ Hệ thống quản trị (Dashboard) dành cho nhân viên vận hành, quản 
 * **Framework:** .NET 10 / ASP.NET Core MVC.
 * **Security Protocol:** OpenID Connect (OIDC) & OAuth 2.0.
 * **State Management:** Memory Cache, Secure Cookies.
-* **UI Stack:** Tailwind CSS & Vue.js (Hybrid Model).
+* **UI Stack:** Tailwind CSS.
 
 ---
 
