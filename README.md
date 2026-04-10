@@ -30,6 +30,7 @@ Hệ thống quản trị (Dashboard) dành cho nhân viên vận hành, quản 
 ## 🔐 Workflow: Authentication & Authorization (Luồng xác thực)
 
 Dự án triển khai cơ chế xác thực tập trung để đảm bảo an toàn cho dữ liệu quản trị:
+![Sơ đồ hệ thống](https://raw.githubusercontent.com/nguyenthinh28902/mini-project-ecommerce/refs/heads/main/images/identity-claims-mapping.png)
 
 ### 1. Phân tầng bảo mật (Middleware Configuration)
 Hệ thống sử dụng cơ chế **Challenge OIDC** để ép buộc xác thực ngay khi người dùng truy cập các tài nguyên nhạy cảm.
