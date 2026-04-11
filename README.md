@@ -1,7 +1,11 @@
 # Ecommerce MVC Client
 
 ## 📝 Giới thiệu
-Hệ thống quản trị (Dashboard) dành cho nhân viên vận hành, quản lý toàn bộ nghiệp vụ của hệ thống thương mại điện tử Microservices. Dự án tập trung vào tính bảo mật cao, khả năng xử lý dữ liệu phức tạp và tối ưu hóa trải nghiệm quản trị viên.
+Hệ thống đa nền tảng Web được xây dựng trên kiến trúc **ASP.NET Core MVC**, đóng vai trò là lớp giao tiếp người dùng (Frontend Clients) trong hệ sinh thái **Microservices**. 
+
+Hệ thống bao gồm hai phân hệ chính:
+* **🛒 Storefront:** Cung cấp trải nghiệm mua sắm tối ưu, mượt mà và hiện đại cho khách hàng.
+* **📊 Management Dashboard (CMS):** Công cụ quản trị tập trung dành cho nhân viên vận hành, giúp quản lý toàn bộ nghiệp vụ hệ thống một cách hiệu quả.
 
 ### 🔗 Core Security & Implementation (Liên kết kỹ thuật trọng tâm)
 
