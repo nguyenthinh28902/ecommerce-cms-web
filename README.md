@@ -19,8 +19,8 @@ Hệ thống quản trị (Dashboard) dành cho nhân viên vận hành, quản 
   * [Cấu hình tại Product Service](https://github.com/nguyenthinh28902/Ecom.ProductService)
 
 ---
-## 🛠 Công nghệ & Giải pháp
-* **Framework:** .NET 10 / ASP.NET Core MVC.
+## 🛠 Technology Used (Công nghệ sử dụng)
+* **Framework & Architecture:** .NET 10 / ASP.NET Core MVC, mô hình MVVM.
 * **Security Protocol:** OpenID Connect (OIDC) & OAuth 2.0, JWT, Cookie Authentication.
 * **State Management:** Memory Cache.
 * **UI Stack:** Tailwind CSS.
@@ -46,26 +46,12 @@ Hệ thống tự động quản lý vòng đời của Access Token để đả
 
 ---
 
-## 💻 Technical Snippets (Điểm nhấn kỹ thuật)
+## 💻 Security Architecture (Kiến trúc bảo mật)
 
-### 1. External Identity Provider Challenge (Chuyển hướng xác thực)
-Thực hiện cơ chế Challenge để yêu cầu định danh từ Identity Server khi người dùng truy cập các tài nguyên yêu cầu bảo mật.
-
-* **File:** [SignInController.cs](https://github.com/nguyenthinh28902/ecommerce-cms-web/blob/main/Ecom.Cms.Web/Controllers/SignInController.cs#L32)
-* **Giải pháp:** Sử dụng `ValidateAntiForgeryToken` và kiểm tra `IsLocalUrl` để ngăn chặn các cuộc tấn công giả mạo (CSRF) và điều hướng không an toàn (Open Redirect).
-
-```csharp
-[HttpPost("chuyen-trang-dang-nhap")]
-[ValidateAntiForgeryToken]
-public IActionResult RedirectToLogin(string returnUrl)
-{
-    var url = (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl)) ? "/" : returnUrl;
-    return Challenge(new AuthenticationProperties { RedirectUri = url }, "oidc");
-}
-```
-
-### 2. Security Middleware & Policy (Cấu hình chính sách bảo mật)
-Thiết lập cơ chế lưu trữ phiên làm việc qua Cookie và giao thức kết nối bảo mật với Identity Provider.
+### 1. Session & Identity (Kiến trúc Bảo mật & Quản lý Phiên)
+* Sử dụng Cookie Authentication để duy trì phiên làm việc (Session Management), kết hợp với giao thức OpenID Connect (OIDC) để thực hiện xác thực thông qua Identity Server.
+* Thực hiện chuyển đổi trạng thái từ Token-based (nhận từ Identity Server) sang Session-based (tại Client MVC). Sau khi xác thực thành công, Middleware sẽ tự động trích xuất các Claims và Token để map vào một Cookie bảo mật.
+* Bảo mật: Để Server quản lý phiên đăng nhập giúp kiểm soát bảo mật an toàn hơn, tận dụng tối đa công nghệ bảo mật của .Net. Đặc biệt, việc thiết lập thuộc tính HttpOnly cho Cookie giúp ngăn chặn hoàn toàn khả năng truy cập token từ Script, loại bỏ rủi ro lỗ hổng bảo mật XSS.
 
 * **File:** [AuthenticationExtensions.cs](https://github.com/nguyenthinh28902/ecommerce-cms-web/blob/main/Ecom.Cms.Web/Common/Auth/AuthenticationExtensions.cs#L21)
 * **Giải pháp:** Triển khai **Authorization Code Flow với PKCE** và thiết lập thuộc tính Cookie nghiêm ngặt (`HttpOnly`, `SecurePolicy`) để bảo vệ Access Token.
@@ -92,13 +78,13 @@ services.AddAuthentication(options => {
 });
 ```
 
-### 3. Transparent Token Refresh Mechanism (Cơ chế làm mới Token tự động)
+### 2. Transparent Token Management (Cơ chế làm mới Token)
 Sử dụng `DelegatingHandler` để tự động đính kèm mã thông báo và xử lý gia hạn phiên làm việc một cách trong suốt.
 
 * **File:** [AuthenticationHeaderHandler.cs](https://github.com/nguyenthinh28902/ecommerce-cms-web/blob/main/Ecom.Cms.Web/Common/HeaderHandler/AuthenticationHeaderHandler.cs)
 * **Giải pháp:** Đánh chặn lỗi `401 Unauthorized`, tự động gọi `RefreshTokenAsync` và thực hiện lại (retry) request gốc với token mới để đảm bảo trải nghiệm người dùng không bị gián đoạn.
 
-```csharp
+```csharp 
 protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
 {
     var accessToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
