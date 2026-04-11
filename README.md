@@ -1,4 +1,4 @@
-# Ecommerce CMS - Hệ thống Quản trị Nội bộ
+# Ecommerce MVC Client
 
 ## 📝 Giới thiệu
 Hệ thống quản trị (Dashboard) dành cho nhân viên vận hành, quản lý toàn bộ nghiệp vụ của hệ thống thương mại điện tử Microservices. Dự án tập trung vào tính bảo mật cao, khả năng xử lý dữ liệu phức tạp và tối ưu hóa trải nghiệm quản trị viên.
