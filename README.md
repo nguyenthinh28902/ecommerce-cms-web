@@ -107,5 +107,36 @@ protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage 
     return response;
 }
 ```
+---
+## 🚀 Memory Cache
+### 🧠 1. In-Memory Cache Service
+* **Cơ chế vận hành:** Sử dụng mô hình kết hợp giữa **TTL (Time-to-Live)** và **LRU (Least Recently Used)** thông qua các thuộc tính `AbsoluteExpiration` và `SlidingExpiration`. Cách tiếp cận này đảm bảo dữ liệu cũ luôn được làm mới định kỳ, đồng thời tự động loại bỏ các vùng nhớ ít được truy cập để tối ưu không gian lưu trữ.
+* **Kiểm soát tài nguyên:** Thiết lập ngưỡng **SizeLimit** nghiêm ngặt cho bộ nhớ đệm. Giúp kiểm soát dung lượng RAM chiếm dụng, ngăn ngừa rủi ro tràn bộ nhớ và đảm bảo ứng dụng vận hành ổn định.
+* **Độ tin cậy:** Tận dụng tối đa công nghệ quản lý bộ nhớ của **.NET** để tự động điều phối thứ tự ưu tiên (`CacheItemPriority`), giúp hệ thống luôn giữ lại các dữ liệu quan trọng nhất khi tài nguyên hệ thống chạm ngưỡng giới hạn.
+### 🔧 2. Cache Service Implementation (Triển khai Cache Service)
+* **Service Registration (Đăng ký dịch vụ):** [Program.cs](https://github.com/nguyenthinh28902/ecommerce-web/blob/main/Ecom.Web/Program.cs#L15)
 
+```csharp
+builder.Services.AddMemoryCache(options =>
+{
+    // Giới hạn tổng số lượng item hoặc dung lượng
+    options.SizeLimit = 1000;
+    // Tần suất quét để dọn dẹp các item hết hạn (mặc định 1 phút)
+    options.ExpirationScanFrequency = TimeSpan.FromSeconds(30);
+});
+```
+
+* **Core Cache Logic Implementation (Triển khai logic cốt lõi):** [CacheService.cs](https://github.com/nguyenthinh28902/ecommerce-web/blob/main/Ecom.Web.Shared/Service/CacheService.cs#L30)
+
+```csharp
+// Cấu hình các tùy chọn cho Cache Item
+var cacheOptions = new MemoryCacheEntryOptions
+{
+    // Thuật toán dọn dẹp mặc định của IMemoryCache là SlidingExpiration kết hợp Priority
+    AbsoluteExpirationRelativeToNow = expiration ?? _defaultExpiration,
+    SlidingExpiration = TimeSpan.FromMinutes(10), // Nếu item không được truy cập trong 10 phút, nó sẽ bị dọn dẹp
+    Priority = CacheItemPriority.High, // Ưu tiên giữ lại khi RAM đầy
+    Size = 1 // Kích thước của item, giúp IMemoryCache quản lý bộ nhớ tốt hơn
+};
+```
 ---
