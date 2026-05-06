@@ -91,27 +91,46 @@ Sử dụng `DelegatingHandler` để tự động đính kèm mã thông báo v
 * **Giải pháp:** Đánh chặn lỗi `401 Unauthorized`, tự động gọi `RefreshTokenAsync` và thực hiện lại (retry) request gốc với token mới để đảm bảo trải nghiệm người dùng không bị gián đoạn.
 
 ```csharp 
-protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
-{
-    var accessToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
-    if (!string.IsNullOrEmpty(accessToken))
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var accessToken = await context.GetTokenAsync("access_token");
+            if (!string.IsNullOrEmpty(accessToken))
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-    var response = await base.SendAsync(request, ct);
+            var response = await base.SendAsync(request, ct);
 
-    if (response.StatusCode == HttpStatusCode.Unauthorized)
-    {
-        var refreshToken = await _httpContextAccessor.HttpContext.GetTokenAsync("refresh_token");
-        var refreshResult = await _authService.RefreshTokenAsync(refreshToken);
-        if (refreshResult.IsSuccess)
-        {
-            await _authTokenCookie.UpdateAuthCookie(refreshResult.Data);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Data.AccessToken);
-            return await base.SendAsync(request, ct); // Retry request
-        }
-    }
-    return response;
-}
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                await _semaphore.WaitAsync(ct);
+                try
+                {
+                    // Kiểm tra xem token đã được cập nhật bởi thread khác chưa
+                    var latestToken = await context.GetTokenAsync("access_token");
+                    if (latestToken != accessToken)
+                    {
+                        // Nếu token đã mới hơn, dùng luôn token này để retry, không gọi API Refresh nữa
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", latestToken);
+                        return await base.SendAsync(request, ct);
+                    }
+
+                    var refreshToken = await context.GetTokenAsync("refresh_token");
+                    if (!string.IsNullOrEmpty(refreshToken))
+                    {
+                        var authService = context.RequestServices.GetRequiredService<IAuthAppService>();
+                        var refreshResult = await authService.RefreshTokenAsync(refreshToken);
+
+                        if (refreshResult?.Data != null && refreshResult.IsSuccess)
+                        {
+                            await _authTokenCookie.UpdateAuthCookie(refreshResult.Data);
+
+                            // Thử lại request với token mới
+                            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Data.AccessToken);
+                            return await base.SendAsync(request, ct);
+                        }
+                    }
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
 ```
 ---
 ## 🚀 Memory Cache
