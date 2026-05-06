@@ -10,7 +10,7 @@ namespace Ecom.Cms.Web.Common.HeaderHandler
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AuthTokenCookie _authTokenCookie;
-
+        private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
         public AuthenticationHeaderHandler(IHttpContextAccessor httpContextAccessor,
             AuthTokenCookie authTokenCookie)
         {
@@ -18,35 +18,53 @@ namespace Ecom.Cms.Web.Common.HeaderHandler
             _authTokenCookie = authTokenCookie;
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
-            var accessToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
-
-            if (!string.IsNullOrEmpty(accessToken))
+            var context = _httpContextAccessor.HttpContext;
+            if (context == null)
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                return await base.SendAsync(request, ct);
             }
 
-            var response = await base.SendAsync(request, cancellationToken);
+            var accessToken = await context.GetTokenAsync("access_token");
+            if (!string.IsNullOrEmpty(accessToken))
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            // Xử lý làm mới token nếu API trả về lỗi không được phép
+            var response = await base.SendAsync(request, ct);
+
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                var refreshToken = await _httpContextAccessor.HttpContext.GetTokenAsync("refresh_token");
-
-                if (!string.IsNullOrEmpty(refreshToken))
+                await _semaphore.WaitAsync(ct);
+                try
                 {
-                    var authService = _httpContextAccessor.HttpContext.RequestServices.GetRequiredService<IAuthAppService>();
-                    var refreshResult = await authService.RefreshTokenAsync(refreshToken);
-
-                    if (refreshResult.IsSuccess)
+                    // Kiểm tra xem token đã được cập nhật bởi thread khác chưa
+                    var latestToken = await context.GetTokenAsync("access_token");
+                    if (latestToken != accessToken)
                     {
-                        await _authTokenCookie.UpdateAuthCookie(refreshResult.Data);
-
-                        // Thử lại request với token mới
-                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Data.AccessToken);
-                        return await base.SendAsync(request, cancellationToken);
+                        // Nếu token đã mới hơn, dùng luôn token này để retry, không gọi API Refresh nữa
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", latestToken);
+                        return await base.SendAsync(request, ct);
                     }
+
+                    var refreshToken = await context.GetTokenAsync("refresh_token");
+                    if (!string.IsNullOrEmpty(refreshToken))
+                    {
+                        var authService = context.RequestServices.GetRequiredService<IAuthAppService>();
+                        var refreshResult = await authService.RefreshTokenAsync(refreshToken);
+
+                        if (refreshResult?.Data != null && refreshResult.IsSuccess)
+                        {
+                            await _authTokenCookie.UpdateAuthCookie(refreshResult.Data);
+
+                            // Thử lại request với token mới
+                            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Data.AccessToken);
+                            return await base.SendAsync(request, ct);
+                        }
+                    }
+                }
+                finally
+                {
+                    _semaphore.Release();
                 }
             }
 
